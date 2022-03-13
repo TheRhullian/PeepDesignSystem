@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "JCB_icon-icons.com_60552.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
+  }
+}
