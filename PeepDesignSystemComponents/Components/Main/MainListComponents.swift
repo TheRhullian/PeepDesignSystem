@@ -1,8 +1,8 @@
 //
 //  MainListComponents.swift
-//  CEAUIKitComponents
+//  PeepDesignSystemComponents
 //
-//  Created by Rhullian Damião on 09/06/21.
+//  Created by Rhullian Damião on 13/03/22.
 //
 
 import UIKit
@@ -18,7 +18,7 @@ enum MainListComponents: CaseIterable {
     
     var sectionTitle: String {
         switch self {
-        case .textfield: return "CEATextfields"
+        case .textfield: return "Textfields"
         }
     }
 }

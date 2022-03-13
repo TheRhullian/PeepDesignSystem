@@ -540,11 +540,6 @@
 				ENABLE_BITCODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				EXCLUDED_SOURCE_FILE_NAMES = (
-					CEAUIKit/Resources/MediaPrd.xcassets,
-					CEAUIKit/Resources/MediaStore.xcassets,
-					CEAUIKit/Resources/MediaDev.xcassets,
-				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -759,11 +754,6 @@
 				ENABLE_BITCODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				EXCLUDED_SOURCE_FILE_NAMES = (
-					CEAUIKit/Resources/MediaPrd.xcassets,
-					CEAUIKit/Resources/MediaHml.xcassets,
-					CEAUIKit/Resources/MediaDev.xcassets,
-				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
