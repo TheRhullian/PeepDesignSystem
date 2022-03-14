@@ -14,5 +14,12 @@ extension UIViewController {
         self.navigationController?.extendedLayoutIncludesOpaqueBars = true
         self.edgesForExtendedLayout = .all
         self.extendedLayoutIncludesOpaqueBars = true
+        
+        if #available(iOS 13.0, *) {
+            let appearence = UINavigationBarAppearance()
+            appearence.backgroundColor = .white
+            self.navigationController?.navigationBar.standardAppearance = appearence
+            self.navigationController?.navigationBar.scrollEdgeAppearance = appearence
+        }
     }
 }
