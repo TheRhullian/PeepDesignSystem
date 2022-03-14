@@ -9,14 +9,34 @@ import UIKit
 
 public class PeepTextfield: UIView {
     // MARK: - Properties
-    enum MaskTypes {
+    public var maskType: MaskTypes = .none
+    
+    /// Constantes que são aplicadas na configuração do Componente
+    enum Constants {
+        //Shadow
+        static let shadowColor: UIColor = .black
+        static let shadowOffset: CGSize = .init(width: -3, height: 8)
+        static let shadowOppacity: Float = 0.3
+        static let shadowRadius: CGFloat = 8
+        static let shadowRadiusDisable: CGFloat = 4
+        static let shadowOppacityDisable: Float = 0.1
+        
+        // Borda
+        static let borderColor: UIColor = .blue.withAlphaComponent(0.5)
+        static let borderWidth: CGFloat = 2
+    }
+    
+    
+    /// Tipos de Máscara
+    public enum MaskTypes {
+        case none
         case cpf
         case cnpj
         case cep
         case cellphone
         case creditCard
         
-        var mask: String {
+        var mask: String? {
             switch self {
             case .cpf:
                 return "###.###.###-##"
@@ -28,10 +48,12 @@ public class PeepTextfield: UIView {
                 return "(##) #####-####"
             case .creditCard:
                 return "#### #### #### ####"
+            case .none:
+                return nil
             }
         }
         
-        var maximumChars: Int {
+        var maximumChars: Int? {
             switch self {
             case .cpf, .cellphone:
                 return 11
@@ -41,6 +63,8 @@ public class PeepTextfield: UIView {
                 return 8
             case .creditCard:
                 return 16
+            case .none:
+                return nil
             }
         }
         
@@ -54,6 +78,7 @@ public class PeepTextfield: UIView {
         let view = UIView(frame: .zero)
         
         view.backgroundColor = .white
+        view.layer.cornerRadius = 4
         view.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubviews([
@@ -68,8 +93,9 @@ public class PeepTextfield: UIView {
         let textfield = UITextField(frame: .zero)
         
         textfield.translatesAutoresizingMaskIntoConstraints = false
-        textfield.borderStyle = .roundedRect
-
+        textfield.borderStyle = .none
+        textfield.delegate = self
+        
         textfield.addTarget(self, action: #selector(textfieldChaged(_:)), for: .editingChanged)
         
         return textfield
@@ -88,11 +114,20 @@ public class PeepTextfield: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         setupConstraints()
+        setupContentBorder()
+        applyShadow(isFieldBeingEdited: false)
     }
     
     // MARK: - Public Methods
     
     // MARK: - Private Methods
+    private func setupContentBorder() {
+        // Cor da Borda
+        self.contentView.layer.borderColor = Constants.borderColor.cgColor
+        // Largura da Borda
+        self.contentView.layer.borderWidth = Constants.borderWidth
+    }
+    
     /// Função responsável pelo setup das constraints
     private func setupConstraints() {
         self.addSubview(contentView)
@@ -106,10 +141,27 @@ public class PeepTextfield: UIView {
             
             //TEXTFIElD CONSTRAINTS
             textfield.heightAnchor.constraint(equalTo: contentView.heightAnchor),
-            textfield.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            textfield.widthAnchor.constraint(equalTo: contentView.widthAnchor, constant: -12),
             textfield.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            textfield.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            textfield.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            textfield.heightAnchor.constraint(equalToConstant: 40)
         ])
+    }
+    
+    /// Função responsável por fazer toda alteração necessária na sombra
+    /// - Parameter isFieldBeingEdited: Campo de texto acionado
+    private func applyShadow(isFieldBeingEdited: Bool) {
+        // Cor da sombra
+        self.contentView.layer.shadowColor = Constants.shadowColor.cgColor
+        // Deslocamento da sombra
+        self.contentView.layer.shadowOffset = Constants.shadowOffset
+        
+        UIView.animate(withDuration: 0.3) {
+            // Desfoque da sombra
+            self.contentView.layer.shadowRadius = isFieldBeingEdited ? Constants.shadowRadius : Constants.shadowRadiusDisable
+            // Opacidade da Sombra
+            self.contentView.layer.shadowOpacity = isFieldBeingEdited ? Constants.shadowOppacity : Constants.shadowOppacityDisable
+        }
     }
     
     
@@ -119,22 +171,29 @@ public class PeepTextfield: UIView {
         return text.replacingOccurrences(of: "\\D", with: "", options: .regularExpression)
     }
     
-    private func applyMaskToText(textChars: String, apply mask: String?) {
+    
+    /// Aplicar máscara no texto digitado no campo de texto
+    /// - Parameters:
+    ///   - text: Texto para aplicar
+    ///   - mask: Máscara para ser aplicada
+    private func applyMaskToText(text: String, apply mask: String?) {
         
         var masked = ""
         var textIndex = 0
         var maskIndex = 0
         
         guard let mask = mask else {
-            textfield.text = textChars
+            textfield.text = text
             return
         }
-
-        while (maskIndex < mask.count && textIndex < textChars.count) {
+        
+        let onlyChars = getOnlyDigitsFromString(text: text)
+        
+        while (maskIndex < mask.count && textIndex < onlyChars.count) {
             var char = mask[mask.index(mask.startIndex, offsetBy: maskIndex)]
             
             if char == "#" {
-                char = textChars[textChars.index(textChars.startIndex, offsetBy: textIndex)]
+                char = onlyChars[text.index(onlyChars.startIndex, offsetBy: textIndex)]
                 textIndex += 1
             }
             
@@ -149,28 +208,19 @@ public class PeepTextfield: UIView {
     /// - Parameter textfield: Textfield sofrendo edição
     @objc func textfieldChaged(_ textfield: UITextField) {
         guard let text = textfield.text else { return }
-        var mask: String?
-
-        let onlyChars = getOnlyDigitsFromString(text: text)
-
-        switch onlyChars.count {
-        case MaskTypes.cellphone.maximumChars:
-            if onlyChars.isValidCPF {
-                mask = MaskTypes.cpf.mask
-            } else {
-                mask = MaskTypes.cellphone.mask
-            }
-        case MaskTypes.cep.maximumChars:
-            mask = MaskTypes.cep.mask
-        case MaskTypes.cnpj.maximumChars:
-            mask = MaskTypes.cnpj.mask
-        case MaskTypes.creditCard.maximumChars:
-            mask = MaskTypes.creditCard.mask
-        default:
-            mask = nil
+        applyMaskToText(text: text, apply: maskType.mask)
+        if let maxChars = maskType.maximumChars, text.count > maxChars {
+            _ = textfield.text?.dropLast()
         }
+    }
+}
 
-        applyMaskToText(textChars: onlyChars, apply: mask)
+extension PeepTextfield: UITextFieldDelegate {
+    public func textFieldDidBeginEditing(_ textField: UITextField) {
+        applyShadow(isFieldBeingEdited: true)
     }
     
+    public func textFieldDidEndEditing(_ textField: UITextField) {
+        applyShadow(isFieldBeingEdited: false)
+    }
 }

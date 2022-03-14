@@ -16,6 +16,13 @@ class TextfieldViewController: UIViewController {
         return textfield
     }()
     
+    private lazy var textfieldWithMask: PeepTextfield = {
+        let textfield = PeepTextfield()
+        textfield.translatesAutoresizingMaskIntoConstraints = false
+        textfield.maskType = .cpf
+        return textfield
+    }()
+    
     override func viewDidLoad() {
         title = "Textfields"
     }
@@ -30,12 +37,20 @@ class TextfieldViewController: UIViewController {
         self.view.backgroundColor = .white
         
         // Setagem do textfield
-        self.view.addSubview(textfield)
+        self.view.addSubviews([
+            textfield,
+            textfieldWithMask
+        ])
         
         NSLayoutConstraint.activate([
-            textfield.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, constant: -16),
+            textfield.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, constant: -30),
             textfield.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            textfield.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20)
+            textfield.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            
+            textfieldWithMask.heightAnchor.constraint(equalTo: textfield.heightAnchor),
+            textfieldWithMask.widthAnchor.constraint(equalTo: textfield.widthAnchor),
+            textfieldWithMask.centerXAnchor.constraint(equalTo: textfield.centerXAnchor),
+            textfieldWithMask.topAnchor.constraint(equalTo: textfield.bottomAnchor, constant: 30)
         ])
     }
 }
