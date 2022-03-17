@@ -9,16 +9,19 @@ import UIKit
 
 enum MainListComponents: CaseIterable {
     case textfield
+    case button
     
     var viewController: UIViewController {
         switch self {
         case .textfield: return TextfieldViewController()
+        case .button: return ButtonViewController()
         }
     }
     
     var sectionTitle: String {
         switch self {
-        case .textfield: return "Textfields"
+        case .textfield: return "Campos de Texto"
+        case .button: return "Botões"
         }
     }
 }
